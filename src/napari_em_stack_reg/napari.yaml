@@ -1,0 +1,57 @@
+name: napari-em-stack-reg
+display_name: EM Stack Registration
+# use 'hidden' to remove plugin from napari hub search results
+visibility: public
+# see https://napari.org/stable/plugins/manifest.html for valid categories
+categories: ["Annotation", "Segmentation", "Acquisition"]
+contributions:
+  commands:
+    - id: napari-em-stack-reg.get_reader
+      python_name: napari_em_stack_reg._reader:napari_get_reader
+      title: Open data with EM Stack Registration
+    - id: napari-em-stack-reg.write_multiple
+      python_name: napari_em_stack_reg._writer:write_multiple
+      title: Save multi-layer data with EM Stack Registration
+    - id: napari-em-stack-reg.write_single_image
+      python_name: napari_em_stack_reg._writer:write_single_image
+      title: Save image data with EM Stack Registration
+    - id: napari-em-stack-reg.make_sample_data
+      python_name: napari_em_stack_reg._sample_data:make_sample_data
+      title: Load sample data from EM Stack Registration
+    - id: napari-em-stack-reg.make_container_widget
+      python_name: napari_em_stack_reg:ImageThreshold
+      title: Make threshold Container widget
+    - id: napari-em-stack-reg.make_magic_widget
+      python_name: napari_em_stack_reg:threshold_magic_widget
+      title: Make threshold magic widget
+    - id: napari-em-stack-reg.make_function_widget
+      python_name: napari_em_stack_reg:threshold_autogenerate_widget
+      title: Make threshold function widget
+    - id: napari-em-stack-reg.make_qwidget
+      python_name: napari_em_stack_reg:ExampleQWidget
+      title: Make example QWidget
+  readers:
+    - command: napari-em-stack-reg.get_reader
+      accepts_directories: false
+      filename_patterns: ['*.npy']
+  writers:
+    - command: napari-em-stack-reg.write_multiple
+      layer_types: ['image*','labels*']
+      filename_extensions: []
+    - command: napari-em-stack-reg.write_single_image
+      layer_types: ['image']
+      filename_extensions: ['.npy']
+  sample_data:
+    - command: napari-em-stack-reg.make_sample_data
+      display_name: EM Stack Registration
+      key: unique_id.1
+  widgets:
+    - command: napari-em-stack-reg.make_container_widget
+      display_name: Container Threshold
+    - command: napari-em-stack-reg.make_magic_widget
+      display_name: Magic Threshold
+    - command: napari-em-stack-reg.make_function_widget
+      autogenerate: true
+      display_name: Autogenerate Threshold
+    - command: napari-em-stack-reg.make_qwidget
+      display_name: Example QWidget
