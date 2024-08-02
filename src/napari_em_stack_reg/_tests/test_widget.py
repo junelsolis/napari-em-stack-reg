@@ -3,13 +3,13 @@ import numpy as np
 from napari_em_stack_reg._widget import EMRegistrationWidget
 
 
-def test_threshold_autogenerate_widget():
-    # because our "widget" is a pure function, we can call it and
-    # test it independently of napari
-    im_data = np.random.random((100, 100))
-    thresholded = threshold_autogenerate_widget(im_data, 0.5)
-    assert thresholded.shape == im_data.shape
-    # etc.
+# def test_threshold_autogenerate_widget():
+#     # because our "widget" is a pure function, we can call it and
+#     # test it independently of napari
+#     im_data = np.random.random((100, 100))
+#     thresholded = threshold_autogenerate_widget(im_data, 0.5)
+#     assert thresholded.shape == im_data.shape
+#     # etc.
 
 
 # make_napari_viewer is a pytest fixture that returns a napari viewer object
