@@ -1,0 +1,6 @@
+name: napari-em-stack-reg
+channels:
+  - conda-forge
+dependencies:
+  - pyqt
+  - python=3.10
