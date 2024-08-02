@@ -45,7 +45,7 @@ from qtpy.QtWidgets import (
     # QHBoxLayout,
     QLabel,
     # QMainWindow,
-    # QPushButton,
+    QPushButton,
     # QScrollArea,
     QVBoxLayout,
     QWidget,
@@ -65,14 +65,28 @@ class EMRegistrationWidget(QWidget):
         self._stack_details = QLabel("No image layer found.")
         self._stack_details.setWordWrap(True)
 
+        self._begin_registration_button = QPushButton("Begin registration")
+        self._begin_registration_button.hide()
+
         self._update_stack_details()
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self._stack_details)
+        self.layout().addWidget(self._begin_registration_button)
 
-        self._viewer.layers.events.inserted.connect(self._update_stack_details)
+        self._viewer.layers.events.inserted.connect(self._on_layer_inserted)
+        self._viewer.layers.events.removed.connect(self._on_layer_removed)
+
+    def _on_layer_inserted(self):
+        self._update_stack_details()
+        self._begin_registration_button.show()
+
+    def _on_layer_removed(self):
+        self._update_stack_details()
+        self._begin_registration_button.hide()
 
     def _update_stack_details(self):
+        # print("this")
         image_layer = next(
             (
                 layer
