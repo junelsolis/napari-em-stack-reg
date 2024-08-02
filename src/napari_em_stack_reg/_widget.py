@@ -28,101 +28,63 @@ References:
 
 Replace code below according to your needs.
 """
+
 from typing import TYPE_CHECKING
 
-from magicgui import magic_factory
-from magicgui.widgets import CheckBox, Container, create_widget
-from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget
-from skimage.util import img_as_float
+# from magicgui import magic_factory
+# from magicgui.widgets import (
+#     CheckBox,
+#     Container,
+#     TextEdit,
+#     create_widget,
+# )
+from napari.layers import Image
+
+# from qtpy.QtCore import Qt
+from qtpy.QtWidgets import (
+    # QHBoxLayout,
+    QLabel,
+    # QMainWindow,
+    # QPushButton,
+    # QScrollArea,
+    QVBoxLayout,
+    QWidget,
+)
 
 if TYPE_CHECKING:
     import napari
 
 
-# Uses the `autogenerate: true` flag in the plugin manifest
-# to indicate it should be wrapped as a magicgui to autogenerate
-# a widget.
-def threshold_autogenerate_widget(
-    img: "napari.types.ImageData",
-    threshold: "float", 
-) -> "napari.types.LabelsData":
-    return img_as_float(img) > threshold
-
-
-# the magic_factory decorator lets us customize aspects of our widget
-# we specify a widget type for the threshold parameter
-# and use auto_call=True so the function is called whenever
-# the value of a parameter changes
-@magic_factory(
-    threshold={"widget_type": "FloatSlider", "max": 1}, auto_call=True
-)
-def threshold_magic_widget(
-    img_layer: "napari.layers.Image", threshold: "float"
-) -> "napari.types.LabelsData":
-    return img_as_float(img_layer.data) > threshold
-
-
 # if we want even more control over our widget, we can use
 # magicgui `Container`
-class ImageThreshold(Container):
+class EMRegistrationWidget(QWidget):
     def __init__(self, viewer: "napari.viewer.Viewer"):
         super().__init__()
         self._viewer = viewer
-        # use create_widget to generate widgets from type annotations
-        self._image_layer_combo = create_widget(
-            label="Image", annotation="napari.layers.Image"
-        )
-        self._threshold_slider = create_widget(
-            label="Threshold", annotation=float, widget_type="FloatSlider"
-        )
-        self._threshold_slider.min = 0
-        self._threshold_slider.max = 1
-        # use magicgui widgets directly
-        self._invert_checkbox = CheckBox(text="Keep pixels below threshold")
 
-        # connect your own callbacks
-        self._threshold_slider.changed.connect(self._threshold_im)
-        self._invert_checkbox.changed.connect(self._threshold_im)
+        self._stack_details = QLabel("No image layer found.")
+        self._stack_details.setWordWrap(True)
 
-        # append into/extend the container with your widgets
-        self.extend(
-            [
-                self._image_layer_combo,
-                self._threshold_slider,
-                self._invert_checkbox,
-            ]
+        self._update_stack_details()
+
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(self._stack_details)
+
+        self._viewer.layers.events.inserted.connect(self._update_stack_details)
+
+    def _update_stack_details(self):
+        image_layer = next(
+            (
+                layer
+                for layer in self._viewer.layers
+                if isinstance(layer, Image)
+            ),
+            None,
         )
 
-    def _threshold_im(self):
-        image_layer = self._image_layer_combo.value
-        if image_layer is None:
-            return
-
-        image = img_as_float(image_layer.data)
-        name = image_layer.name + "_thresholded"
-        threshold = self._threshold_slider.value
-        if self._invert_checkbox.value:
-            thresholded = image < threshold
+        if image_layer is not None:
+            self._stack_details.setText(
+                f"Stack details:\n\nshape: {image_layer.data.shape}\ndtype: {image_layer.data.dtype}"
+            )
         else:
-            thresholded = image > threshold
-        if name in self._viewer.layers:
-            self._viewer.layers[name].data = thresholded
-        else:
-            self._viewer.add_labels(thresholded, name=name)
-
-
-class ExampleQWidget(QWidget):
-    # your QWidget.__init__ can optionally request the napari viewer instance
-    # use a type annotation of 'napari.viewer.Viewer' for any parameter
-    def __init__(self, viewer: "napari.viewer.Viewer"):
-        super().__init__()
-        self.viewer = viewer
-
-        btn = QPushButton("Click me!")
-        btn.clicked.connect(self._on_click)
-
-        self.setLayout(QHBoxLayout())
-        self.layout().addWidget(btn)
-
-    def _on_click(self):
-        print("napari has", len(self.viewer.layers), "layers")
+            self._stack_details.setText("No image layer found.")
