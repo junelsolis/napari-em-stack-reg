@@ -6,9 +6,9 @@ visibility: public
 categories: ["Annotation", "Segmentation", "Acquisition"]
 contributions:
   commands:
-    - id: napari-em-stack-reg.get_reader
-      python_name: napari_em_stack_reg._reader:napari_get_reader
-      title: Open data with EM Stack Registration
+    # - id: napari-em-stack-reg.get_reader
+    #   python_name: napari_em_stack_reg._reader:napari_get_reader
+    #   title: Open data with EM Stack Registration
     - id: napari-em-stack-reg.write_multiple
       python_name: napari_em_stack_reg._writer:write_multiple
       title: Save multi-layer data with EM Stack Registration
@@ -35,10 +35,10 @@ contributions:
     # - id: napari-em-stack-reg.make_qwidget
     #   python_name: napari_em_stack_reg:ExampleQWidget
     #   title: Make example QWidget
-  readers:
-    - command: napari-em-stack-reg.get_reader
-      accepts_directories: false
-      filename_patterns: ["*.npy"]
+  # readers:
+  #   - command: napari-em-stack-reg.get_reader
+  #     accepts_directories: true
+  #     filename_patterns: ["*.npy", "*.tif", "*.tiff"]
   writers:
     - command: napari-em-stack-reg.write_multiple
       layer_types: ["image*", "labels*"]
