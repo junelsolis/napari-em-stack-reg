@@ -42,6 +42,7 @@ from napari.layers import Image
 
 # from qtpy.QtCore import Qt
 from qtpy.QtWidgets import (
+    QFrame,
     # QHBoxLayout,
     QLabel,
     # QMainWindow,
@@ -50,6 +51,9 @@ from qtpy.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+from napari_em_stack_reg.tools.register import StackableImage
+
 
 if TYPE_CHECKING:
     import napari
@@ -65,25 +69,45 @@ class EMRegistrationWidget(QWidget):
         self._stack_details = QLabel("No image layer found.")
         self._stack_details.setWordWrap(True)
 
-        self._begin_registration_button = QPushButton("Begin registration")
-        self._begin_registration_button.hide()
+        self._begin_button = QPushButton("Begin")
+        self._begin_button.hide()
 
         self._update_stack_details()
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self._stack_details)
-        self.layout().addWidget(self._begin_registration_button)
+
+        self._divider = QFrame()
+        self._divider.setFrameShape(QFrame.HLine)
+        self._divider.setFrameShadow(QFrame.Sunken)
+        self.layout().addWidget(self._divider)
+        self.layout().addWidget(self._begin_button)
 
         self._viewer.layers.events.inserted.connect(self._on_layer_inserted)
         self._viewer.layers.events.removed.connect(self._on_layer_removed)
 
+        self._begin_button.clicked.connect(self._on_begin_button_clicked)
+
     def _on_layer_inserted(self):
         self._update_stack_details()
-        self._begin_registration_button.show()
+        self._begin_button.show()
 
     def _on_layer_removed(self):
         self._update_stack_details()
-        self._begin_registration_button.hide()
+        self._begin_button.hide()
+
+    def _on_begin_button_clicked(self):
+        # print("Begin button clicked")
+
+        self._begin_button.hide()
+        stackable_img = StackableImage(self._viewer)
+        stackable_img.get_registration_images()
+
+        for layer in self._viewer.layers:
+            layer.events.transform.connect(self._on_transform_changed)
+
+    def _on_transform_changed(self, event):
+        print("Transform changed")
 
     def _update_stack_details(self):
         # print("this")
